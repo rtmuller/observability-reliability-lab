@@ -1,0 +1,18 @@
+# Docker volumes
+prometheus-data/
+grafana-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+.env
