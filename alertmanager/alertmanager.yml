@@ -1,0 +1,68 @@
+global:
+  resolve_timeout: 5m
+
+# ---------------------------------------------------------------
+# Routing tree
+# ---------------------------------------------------------------
+route:
+  receiver: "default"
+  group_by: ["alertname", "job"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  routes:
+    # -----------------------------------------------------------
+    # Watchdog (DeadMansSwitch) — routed to external heartbeat
+    # In production, point this to Healthchecks.io, PagerDuty
+    # heartbeat, or Deadman's Snitch.
+    # -----------------------------------------------------------
+    - match:
+        alertname: Watchdog
+      receiver: "deadmansswitch"
+      repeat_interval: 1m
+      group_wait: 0s
+      group_interval: 1m
+
+    # -----------------------------------------------------------
+    # Critical alerts — immediate notification
+    # -----------------------------------------------------------
+    - match:
+        severity: critical
+      receiver: "critical"
+      repeat_interval: 15m
+
+# ---------------------------------------------------------------
+# Receivers
+# ---------------------------------------------------------------
+receivers:
+  # Default receiver — logs to AlertManager UI
+  - name: "default"
+
+  # DeadMansSwitch — in production, replace with a real webhook:
+  #
+  #   - name: "deadmansswitch"
+  #     webhook_configs:
+  #       - url: "https://hc-ping.com/your-uuid-here"
+  #         send_resolved: false
+  #
+  # For this lab, we use a no-op receiver. The key concept:
+  # the Watchdog alert should always be firing. In production,
+  # this receiver MUST point to an external heartbeat service
+  # that alerts you when check-ins stop arriving.
+  - name: "deadmansswitch"
+
+  # Critical alerts — in production, use PagerDuty, OpsGenie, etc.
+  - name: "critical"
+
+# ---------------------------------------------------------------
+# Inhibition rules
+# ---------------------------------------------------------------
+inhibit_rules:
+  # If a target is completely down, suppress absent-data alerts
+  # for the same job (they are redundant)
+  - source_matchers:
+      - alertname = TargetDown
+    target_matchers:
+      - alertname =~ ".*Absent"
+    equal: ["job"]
