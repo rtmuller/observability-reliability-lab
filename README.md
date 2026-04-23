@@ -227,4 +227,4 @@ MIT
 
 ---
 
-**Author:** [Rafael Muller](https://medium.com/@rafael_muller) — Cloud Engineer building scalable infrastructure and sharing lessons learned.
+**Author:** [Rafael Muller](https://github.com/rtmuller) — Senior Cloud Engineer at Airbnb, working on platform infrastructure at 8M+ listings scale. Writing at [Medium](https://medium.com/@rafael_muller).
